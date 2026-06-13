@@ -61,6 +61,19 @@ namespace ENyayPath.PICS.EntityFrameworkCore.DbContexts
         // Lookup
         public DbSet<LookupMaster> Lookups { get; set; } = default!;
 
+        // Document
+        public DbSet<DocumentMaster> Documents { get; set; } = default!;
+
+        // Prisoner related
+        public DbSet<PrisonerBiometricData> PrisonerBiometricData { get; set; } = default!;
+        public DbSet<PrisonerContactPerson> PrisonerContactPersons { get; set; } = default!;
+        public DbSet<PrisonerContactDetail> PrisonerContactDetails { get; set; } = default!;
+        public DbSet<PrisonerContactPersonDocument> PrisonerContactPersonDocuments { get; set; } = default!;
+        public DbSet<PrisonalContactApprovalProcess> ContactApprovalProcesses { get; set; } = default!;
+        public DbSet<PrisonerCallRecord> PrisonerCallRecords { get; set; } = default!;
+        public DbSet<Recharge> Recharges { get; set; } = default!;
+        public DbSet<Wallet> Wallets { get; set; } = default!;
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -132,6 +145,95 @@ namespace ENyayPath.PICS.EntityFrameworkCore.DbContexts
                 .HasOne(c => c.State)
                 .WithMany()
                 .HasForeignKey(c => c.StateId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Prisoner unique index on PrisonerId
+            builder.Entity<Prisoner>()
+                .HasIndex(p => p.PrisonerId)
+                .IsUnique();
+
+            // PrisonerBiometricData FK relationships
+            builder.Entity<PrisonerBiometricData>()
+                .HasOne<Prisoner>()
+                .WithMany()
+                .HasForeignKey(b => b.PrisonerId)
+                .HasPrincipalKey(p => p.PrisonerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<PrisonerBiometricData>()
+                .HasOne<LookupMaster>()
+                .WithMany()
+                .HasForeignKey(b => b.AuthenticationType)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // PrisonerContactPerson FK
+            builder.Entity<PrisonerContactPerson>()
+                .HasOne<Prisoner>()
+                .WithMany()
+                .HasForeignKey(c => c.PrisonerId)
+                .HasPrincipalKey(p => p.PrisonerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // PrisonerContactDetail FK
+            builder.Entity<PrisonerContactDetail>()
+                .HasOne<PrisonerContactPerson>()
+                .WithMany()
+                .HasForeignKey(d => d.PrisonerContactPersonId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // PrisonerContactPersonDocument FKs
+            builder.Entity<PrisonerContactPersonDocument>()
+                .HasOne<PrisonerContactPerson>()
+                .WithMany()
+                .HasForeignKey(d => d.PrisonerContactPersonId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<PrisonerContactPersonDocument>()
+                .HasOne<DocumentMaster>()
+                .WithMany()
+                .HasForeignKey(d => d.DocumentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // PrisonalContactApprovalProcess FKs
+            builder.Entity<PrisonalContactApprovalProcess>()
+                .HasOne<PrisonerContactPersonDocument>()
+                .WithMany()
+                .HasForeignKey(a => a.PrisonerContactPersonDocumentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // PrisonerCallRecord FKs
+            builder.Entity<PrisonerCallRecord>()
+                .HasOne<PrisonerContactDetail>()
+                .WithMany()
+                .HasForeignKey(r => r.PrisonerContactDetailsId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<PrisonerCallRecord>()
+                .HasOne<LookupMaster>()
+                .WithMany()
+                .HasForeignKey(r => r.TypeOfCall)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Recharge FKs
+            builder.Entity<Recharge>()
+                .HasOne<Prisoner>()
+                .WithMany()
+                .HasForeignKey(r => r.PrisonerId)
+                .HasPrincipalKey(p => p.PrisonerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Recharge>()
+                .HasOne<LookupMaster>()
+                .WithMany()
+                .HasForeignKey(r => r.RechargeType)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Wallet FK
+            builder.Entity<Wallet>()
+                .HasOne<Prisoner>()
+                .WithMany()
+                .HasForeignKey(w => w.PrisonerId)
+                .HasPrincipalKey(p => p.PrisonerId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 
