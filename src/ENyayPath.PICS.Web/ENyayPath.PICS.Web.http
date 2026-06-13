@@ -1,0 +1,6 @@
+@ENyayPath.PICS.Web_HostAddress = http://localhost:5170
+
+GET {{ENyayPath.PICS.Web_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ENyayPath.PICS.Application/ENyayPath.PICS.Application.csproj" />
+    <Project Path="src/ENyayPath.PICS.Core/ENyayPath.PICS.Core.csproj" />
+    <Project Path="src/ENyayPath.PICS.EntityFrameworkCore/ENyayPath.PICS.EntityFrameworkCore.csproj" />
+    <Project Path="src/ENyayPath.PICS.Web/ENyayPath.PICS.Web.csproj" />
+  </Folder>
+</Solution>
