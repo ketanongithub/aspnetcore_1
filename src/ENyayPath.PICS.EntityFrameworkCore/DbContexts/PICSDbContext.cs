@@ -3,6 +3,7 @@ using ENyayPath.PICS.Core.Authorization.Roles;
 using ENyayPath.PICS.Core.Authorization.Users;
 using ENyayPath.PICS.Core.BackgroundJob;
 using ENyayPath.PICS.Core.Editions;
+using ENyayPath.PICS.Core.Eny.Prisoner;
 using ENyayPath.PICS.Core.Features;
 using ENyayPath.PICS.Core.Localization;
 using ENyayPath.PICS.Core.MultiTenancy;
@@ -43,6 +44,9 @@ namespace ENyayPath.PICS.EntityFrameworkCore.DbContexts
         public DbSet<OrganizationUnit> OrganizationUnits { get; set; } = default!;
         public DbSet<UserOrganizationUnit> UserOrganizationUnits { get; set; } = default!;
         public DbSet<OrganizationUnitRole> OrganizationUnitRoles { get; set; } = default!;
+
+        // Prisoner
+        public DbSet<Prisoner> Prisoners { get; set; } = default!;
 
 
         protected override void OnModelCreating(ModelBuilder builder)

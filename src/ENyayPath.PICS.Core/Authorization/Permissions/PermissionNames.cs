@@ -47,6 +47,12 @@ namespace ENyayPath.PICS.Core.Authorization.Permissions
         public const string Settings_Update = "Settings.Update";
         public const string Settings_Delete = "Settings.Delete";
 
+        // --- Prisoner Management ---
+        public const string Prisoners_Create = "Prisoners.Create";
+        public const string Prisoners_Read = "Prisoners.Read";
+        public const string Prisoners_Update = "Prisoners.Update";
+        public const string Prisoners_Delete = "Prisoners.Delete";
+
         /// <summary>
         /// Returns all permission constants defined in this class.
         /// </summary>
