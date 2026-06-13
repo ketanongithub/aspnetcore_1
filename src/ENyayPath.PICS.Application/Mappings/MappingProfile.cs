@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using ENyayPath.PICS.Application.Authorization.Roles.Dtos;
+using ENyayPath.PICS.Application.Country.Dtos;
 using ENyayPath.PICS.Application.DTOs;
 using ENyayPath.PICS.Application.Prisoner.Dtos;
 using ENyayPath.PICS.Core.Authorization.Roles;
+using ENyayPath.PICS.Core.Eny.Common;
 using ENyayPath.PICS.Core.Entities;
 using ENyayPath.PICS.Core.MultiTenancy;
 using ENyayPath.PICS.Core.Settings;
@@ -29,6 +31,10 @@ namespace ENyayPath.PICS.Application.Mappings
             CreateMap<Core.Eny.Prisoner.Prisoner, PrisonerDto>().ReverseMap();
             CreateMap<CreatePrisonerDto, Core.Eny.Prisoner.Prisoner>();
             CreateMap<UpdatePrisonerDto, Core.Eny.Prisoner.Prisoner>();
+
+            // Country mappings
+            CreateMap<CountryMaster, CountryDto>()
+                .ForMember(dest => dest.CountryId, opt => opt.MapFrom(src => src.Id));
         }
     }
 }

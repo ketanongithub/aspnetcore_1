@@ -3,6 +3,7 @@ using ENyayPath.PICS.Core.Authorization.Roles;
 using ENyayPath.PICS.Core.Authorization.Users;
 using ENyayPath.PICS.Core.BackgroundJob;
 using ENyayPath.PICS.Core.Editions;
+using ENyayPath.PICS.Core.Eny.Common;
 using ENyayPath.PICS.Core.Eny.Prisoner;
 using ENyayPath.PICS.Core.Features;
 using ENyayPath.PICS.Core.Localization;
@@ -48,6 +49,9 @@ namespace ENyayPath.PICS.EntityFrameworkCore.DbContexts
         // Prisoner
         public DbSet<Prisoner> Prisoners { get; set; } = default!;
 
+        // Country
+        public DbSet<CountryMaster> Countries { get; set; } = default!;
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -91,6 +95,11 @@ namespace ENyayPath.PICS.EntityFrameworkCore.DbContexts
                 .HasMany(o => o.RoleLinks)
                 .WithOne()
                 .HasForeignKey(r => r.OrganizationUnitId);
+
+            // Country unique constraint
+            builder.Entity<CountryMaster>()
+                .HasIndex(c => c.CountryCode)
+                .IsUnique();
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
