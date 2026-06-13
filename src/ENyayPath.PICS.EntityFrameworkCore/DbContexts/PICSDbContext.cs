@@ -3,6 +3,8 @@ using ENyayPath.PICS.Core.Authorization.Roles;
 using ENyayPath.PICS.Core.Authorization.Users;
 using ENyayPath.PICS.Core.BackgroundJob;
 using ENyayPath.PICS.Core.Editions;
+using ENyayPath.PICS.Core.Eny.Common;
+using ENyayPath.PICS.Core.Eny.Prisoner;
 using ENyayPath.PICS.Core.Features;
 using ENyayPath.PICS.Core.Localization;
 using ENyayPath.PICS.Core.MultiTenancy;
@@ -43,6 +45,21 @@ namespace ENyayPath.PICS.EntityFrameworkCore.DbContexts
         public DbSet<OrganizationUnit> OrganizationUnits { get; set; } = default!;
         public DbSet<UserOrganizationUnit> UserOrganizationUnits { get; set; } = default!;
         public DbSet<OrganizationUnitRole> OrganizationUnitRoles { get; set; } = default!;
+
+        // Prisoner
+        public DbSet<Prisoner> Prisoners { get; set; } = default!;
+
+        // Country
+        public DbSet<CountryMaster> Countries { get; set; } = default!;
+
+        // State
+        public DbSet<StateMaster> States { get; set; } = default!;
+
+        // City
+        public DbSet<CityMaster> Cities { get; set; } = default!;
+
+        // Lookup
+        public DbSet<LookupMaster> Lookups { get; set; } = default!;
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -87,6 +104,35 @@ namespace ENyayPath.PICS.EntityFrameworkCore.DbContexts
                 .HasMany(o => o.RoleLinks)
                 .WithOne()
                 .HasForeignKey(r => r.OrganizationUnitId);
+
+            // Country unique constraint
+            builder.Entity<CountryMaster>()
+                .HasIndex(c => c.CountryCode)
+                .IsUnique();
+
+            // State relationships and constraints
+            builder.Entity<StateMaster>()
+                .HasOne(s => s.Country)
+                .WithMany()
+                .HasForeignKey(s => s.CountryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<StateMaster>()
+                .HasIndex(s => s.StateCode)
+                .IsUnique();
+
+            // City relationships
+            builder.Entity<CityMaster>()
+                .HasOne(c => c.Country)
+                .WithMany()
+                .HasForeignKey(c => c.CountryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<CityMaster>()
+                .HasOne(c => c.State)
+                .WithMany()
+                .HasForeignKey(c => c.StateId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

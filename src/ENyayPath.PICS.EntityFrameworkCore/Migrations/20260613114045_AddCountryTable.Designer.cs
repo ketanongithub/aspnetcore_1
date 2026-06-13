@@ -4,6 +4,7 @@ using ENyayPath.PICS.EntityFrameworkCore.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
 {
     [DbContext(typeof(PICSDbContext))]
-    partial class PICSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260613114045_AddCountryTable")]
+    partial class AddCountryTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -343,39 +346,6 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
                     b.ToTable("SysEditions");
                 });
 
-            modelBuilder.Entity("ENyayPath.PICS.Core.Eny.Common.CityMaster", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("CityId");
-
-                    b.Property<string>("CityName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<Guid>("CountryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("StateId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CountryId");
-
-                    b.HasIndex("StateId");
-
-                    b.ToTable("City");
-                });
-
             modelBuilder.Entity("ENyayPath.PICS.Core.Eny.Common.CountryMaster", b =>
                 {
                     b.Property<Guid>("Id")
@@ -408,84 +378,6 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
                         .IsUnique();
 
                     b.ToTable("Country");
-                });
-
-            modelBuilder.Entity("ENyayPath.PICS.Core.Eny.Common.LookupMaster", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("LookupId");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LookupCode")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("LookupType")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("LookupValue")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Lookup");
-                });
-
-            modelBuilder.Entity("ENyayPath.PICS.Core.Eny.Common.StateMaster", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("StateId");
-
-                    b.Property<Guid>("CountryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("StateCode")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("nvarchar(3)");
-
-                    b.Property<string>("StateName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CountryId");
-
-                    b.HasIndex("StateCode")
-                        .IsUnique();
-
-                    b.ToTable("State");
                 });
 
             modelBuilder.Entity("ENyayPath.PICS.Core.Eny.Prisoner.Prisoner", b =>
@@ -1285,36 +1177,6 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
                     b.Navigation("DeleterUser");
 
                     b.Navigation("LastModifierUser");
-                });
-
-            modelBuilder.Entity("ENyayPath.PICS.Core.Eny.Common.CityMaster", b =>
-                {
-                    b.HasOne("ENyayPath.PICS.Core.Eny.Common.CountryMaster", "Country")
-                        .WithMany()
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ENyayPath.PICS.Core.Eny.Common.StateMaster", "State")
-                        .WithMany()
-                        .HasForeignKey("StateId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Country");
-
-                    b.Navigation("State");
-                });
-
-            modelBuilder.Entity("ENyayPath.PICS.Core.Eny.Common.StateMaster", b =>
-                {
-                    b.HasOne("ENyayPath.PICS.Core.Eny.Common.CountryMaster", "Country")
-                        .WithMany()
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Country");
                 });
 
             modelBuilder.Entity("ENyayPath.PICS.Core.Features.Feature", b =>

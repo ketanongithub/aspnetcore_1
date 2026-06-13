@@ -1,0 +1,21 @@
+using System;
+
+namespace ENyayPath.PICS.Application.Prisoner.Dtos
+{
+    public class PrisonerDto
+    {
+        public int Id { get; set; }
+        public Guid PrisonerId { get; set; }
+        public Guid PrisonId { get; set; }
+        public string PrisonerBatchNo { get; set; } = null!;
+        public string PrisonerName { get; set; } = null!;
+        public DateTime Dob { get; set; }
+        public string? PrisonerStatus { get; set; }
+        public int? AllowedMinutesPerWeek { get; set; }
+        public bool? IsAudioCallEnabled { get; set; }
+        public bool? IsVideoCallEnabled { get; set; }
+        public bool? IsActive { get; set; }
+        public DateTime CreationTime { get; set; }
+        public DateTime? LastModificationTime { get; set; }
+    }
+}
