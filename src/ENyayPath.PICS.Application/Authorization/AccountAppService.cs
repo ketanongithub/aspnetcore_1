@@ -68,7 +68,7 @@ namespace ENyayPath.PICS.Application.Identity
                 return new LoginOutput { Success = false, ErrorMessage = result.ErrorMessage };
 
             var token = _jwtTokenGenerator.GenerateJwtToken(result.User!, result.Roles!);
-            return new LoginOutput { Success = true, Token = token, ExpiresAt = DateTime.UtcNow.AddHours(1) };
+            return new LoginOutput { Success = true, UserId = result.User!.Id, Token = token, ExpiresAt = DateTime.UtcNow.AddHours(1) };
         }
 
         [Authorize]
