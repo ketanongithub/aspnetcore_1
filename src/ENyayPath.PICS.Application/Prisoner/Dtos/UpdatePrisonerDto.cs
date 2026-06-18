@@ -28,5 +28,17 @@ namespace ENyayPath.PICS.Application.Prisoner.Dtos
         public bool? IsVideoCallEnabled { get; set; }
 
         public bool? IsActive { get; set; }
+
+        public string? SonDaughterOf { get; set; }
+
+        public string? MotherName { get; set; }
+
+        public string? SpouseName { get; set; }
+
+        public Guid? StateId { get; set; }
+
+        public string? Gender { get; set; }
+
+
     }
 }
