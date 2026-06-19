@@ -49,6 +49,7 @@ namespace ENyayPath.PICS.Core.Eny.Prisoner
 
         public DateTime? ModifiedDate { get; set; }
 
+        public Guid? CountryId { get; set; }
 
     }
 }

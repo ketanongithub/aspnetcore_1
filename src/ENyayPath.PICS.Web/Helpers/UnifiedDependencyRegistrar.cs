@@ -247,11 +247,11 @@ namespace ENyayPath.PICS.Web.Helpers
                 var dto = await ctx.Request.ReadFromJsonAsync(bodyType);
                 args = new[] { dto! };
                 
-                var result = method.Invoke(service, args);
+                var result = method.Invoke(service, args); 
                 return await ToResult(result);
             });
         }
-
+         
         private static Assembly[] EnsureAssemblies(Assembly[] assemblies)
         {
             if (assemblies != null && assemblies.Length > 0) return assemblies.Distinct().ToArray();

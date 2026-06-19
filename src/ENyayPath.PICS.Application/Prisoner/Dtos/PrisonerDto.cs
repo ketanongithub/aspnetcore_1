@@ -23,7 +23,8 @@ namespace ENyayPath.PICS.Application.Prisoner.Dtos
         public string? SpouseName { get; set; }
         public Guid? StateId { get; set; }
         public string? Gender { get; set; }
-    
+
+        public Guid? CountryId { get; set; }
 
     }
 }

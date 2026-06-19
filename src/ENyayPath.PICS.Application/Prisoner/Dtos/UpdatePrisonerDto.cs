@@ -39,6 +39,6 @@ namespace ENyayPath.PICS.Application.Prisoner.Dtos
 
         public string? Gender { get; set; }
 
-
+        public Guid? CountryId { get; set; }
     }
 }
