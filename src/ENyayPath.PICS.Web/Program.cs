@@ -20,10 +20,13 @@ using ENyayPath.PICS.Web.Startup;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Read connection string from appsettings.json
+// Load appsettings.json first, then read the connection string
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 var connectionString = builder.Configuration.GetConnectionString("Default");
 
 // Register DbContext with connection string
