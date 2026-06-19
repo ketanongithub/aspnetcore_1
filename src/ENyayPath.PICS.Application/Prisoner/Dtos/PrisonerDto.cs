@@ -17,5 +17,12 @@ namespace ENyayPath.PICS.Application.Prisoner.Dtos
         public bool? IsActive { get; set; }
         public DateTime CreationTime { get; set; }
         public DateTime? LastModificationTime { get; set; }
+
+        public string? SonOrDaughterOf { get; set; }
+        public string? MotherName { get; set; }
+        public string? SpouseName { get; set; }
+        public Guid StateId  { get; set; }
+        public string? Gender  { get; set; }
+       
     }
 }
