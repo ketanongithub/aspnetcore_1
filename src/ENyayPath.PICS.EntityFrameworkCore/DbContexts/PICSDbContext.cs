@@ -73,7 +73,7 @@ namespace ENyayPath.PICS.EntityFrameworkCore.DbContexts
         public DbSet<PrisonerCallRecord> PrisonerCallRecords { get; set; } = default!;
         public DbSet<Recharge> Recharges { get; set; } = default!;
         public DbSet<Wallet> Wallets { get; set; } = default!;
-
+        public DbSet<PrisonerDocument> PrisonerDocuments { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -233,6 +233,14 @@ namespace ENyayPath.PICS.EntityFrameworkCore.DbContexts
                 .HasOne<Prisoner>()
                 .WithMany()
                 .HasForeignKey(w => w.PrisonerId)
+                .HasPrincipalKey(p => p.PrisonerId)
+                .OnDelete(DeleteBehavior.Restrict);
+           
+            // PrisonerDocument
+            builder.Entity<PrisonerDocument>()
+                .HasOne<Prisoner>()
+                .WithMany()
+                .HasForeignKey(d => d.PrisonerId)
                 .HasPrincipalKey(p => p.PrisonerId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
