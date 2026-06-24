@@ -26,5 +26,7 @@ namespace ENyayPath.PICS.Application.Prisoner.Dtos
 
         public Guid? CountryId { get; set; }
 
+        public Guid CityId { get; set; }
+
     }
 }
