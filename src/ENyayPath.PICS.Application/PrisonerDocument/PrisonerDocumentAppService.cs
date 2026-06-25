@@ -39,9 +39,13 @@ namespace ENyayPath.PICS.Application.PrisonerDocument
         {
             if (file == null || file.Length == 0) throw new ArgumentException("No file provided");
 
+            // Validate PrisonerId is not empty
+            if (input.PrisonerId == Guid.Empty)
+                throw new InvalidOperationException("PrisonerId is required and must be a valid GUID");
+
             // Validate prisoner exists by PrisonerId GUID (Prisoner entity uses int PK but has PrisonerId GUID column)
             var prisoner = await _prisonerRepo.FirstOrDefaultAsync(p => p.PrisonerId == input.PrisonerId);
-            if (prisoner == null) throw new InvalidOperationException("Prisoner not found");
+            if (prisoner == null) throw new InvalidOperationException($"Prisoner not found for PrisonerId: {input.PrisonerId}");
 
             // Basic validations
             var allowed = new[] { ".pdf", ".png", ".jpg", ".jpeg" };

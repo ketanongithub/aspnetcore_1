@@ -288,7 +288,12 @@ namespace ENyayPath.PICS.Web.Helpers
                             if (formValue == null) continue;
 
                             if (prop.PropertyType == typeof(Guid))
-                                prop.SetValue(dto, Guid.Parse(formValue));
+                            {
+                                if (Guid.TryParse(formValue, out var guidVal))
+                                    prop.SetValue(dto, guidVal);
+                                else
+                                    throw new ArgumentException($"Invalid GUID value '{formValue}' for property '{prop.Name}'");
+                            }
                             else if (prop.PropertyType == typeof(string))
                                 prop.SetValue(dto, formValue);
                             else if (prop.PropertyType == typeof(int))
