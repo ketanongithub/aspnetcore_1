@@ -4,6 +4,7 @@ using ENyayPath.PICS.Core.Authorization.Users;
 using ENyayPath.PICS.Core.BackgroundJob;
 using ENyayPath.PICS.Core.Editions;
 using ENyayPath.PICS.Core.Eny.Common;
+using ENyayPath.PICS.Core.Eny.Prison;
 using ENyayPath.PICS.Core.Eny.Prisoner;
 using ENyayPath.PICS.Core.Features;
 using ENyayPath.PICS.Core.Localization;
@@ -75,6 +76,7 @@ namespace ENyayPath.PICS.EntityFrameworkCore.DbContexts
         public DbSet<Wallet> Wallets { get; set; } = default!;
         public DbSet<PrisonerDocument> PrisonerDocuments { get; set; } = default!;
 
+        public DbSet<Prison> Prisons { get; set; } = default!;
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -242,6 +244,23 @@ namespace ENyayPath.PICS.EntityFrameworkCore.DbContexts
                 .WithMany()
                 .HasForeignKey(d => d.PrisonerId)
                 .HasPrincipalKey(p => p.PrisonerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Prison FK
+            builder.Entity<Prison>()
+                .HasOne<CountryMaster>()
+                .WithMany()
+                .HasForeignKey(p => p.CountryId)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Prison>()
+                .HasOne<StateMaster>()
+                .WithMany()
+                .HasForeignKey(p => p.StateId)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Prison>()
+                .HasOne<CityMaster>()
+                .WithMany()
+                .HasForeignKey(p => p.CityId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 

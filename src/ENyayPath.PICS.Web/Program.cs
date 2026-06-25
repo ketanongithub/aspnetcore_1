@@ -102,6 +102,10 @@ using (var scope = app.Services.CreateScope())
     await SysDataSeeder.SeedAsync(dbContext);               // Editions, Tenants, Features
     await SysDataSeeder.SeedLanguagesAsync(dbContext);      // Languages + translations
     await SysDataSeeder.SeedSettingsAsync(dbContext);       // System settings
+    await SysDataSeeder.DocumentAsync(dbContext);          // DocumentMaster
+    await SysDataSeeder.SeedCountryAsync(dbContext);        // Countries    
+    await SysDataSeeder.SeedStateAsync(dbContext);          //states
+    await SysDataSeeder.SeedPrisonAsync(dbContext);      // Prisoners
 
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();

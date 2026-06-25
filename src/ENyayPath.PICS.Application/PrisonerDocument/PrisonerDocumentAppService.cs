@@ -51,7 +51,7 @@ namespace ENyayPath.PICS.Application.PrisonerDocument
             if (file.Length > maxBytes) throw new InvalidOperationException("File too large");
 
             // Save file
-            var relativePath = await _fileStorage.SaveAsync(file, $"prisoner-docs/{input.PrisonerId}");
+            var relativePath = await _fileStorage.SaveAsync(file, $"prisoner-docs/{prisoner.Id}");
 
             // Create record
             var entity = new Core.Eny.Prisoner.PrisonerDocument
@@ -76,6 +76,6 @@ namespace ENyayPath.PICS.Application.PrisonerDocument
             var e = await _docRepo.GetAsync(id);
             return _mapper.Map<PrisonerDocumentDto>(e);
         }
-
+        
     }
 }

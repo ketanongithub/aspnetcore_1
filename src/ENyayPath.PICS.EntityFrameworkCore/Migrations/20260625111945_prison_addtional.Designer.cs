@@ -4,6 +4,7 @@ using ENyayPath.PICS.EntityFrameworkCore.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
 {
     [DbContext(typeof(PICSDbContext))]
-    partial class PICSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260625111945_prison_addtional")]
+    partial class prison_addtional
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
