@@ -23,7 +23,7 @@ namespace ENyayPath.PICS.Core.Eny.Prisoner
 
         public string? PrisonerStatus { get; set; }
 
-        public string? SonDaughterOf { get; set; }
+        public string? SonOrDaughterOf { get; set; }
 
         public string? MotherName { get; set; }
 
@@ -32,6 +32,8 @@ namespace ENyayPath.PICS.Core.Eny.Prisoner
         public Guid? StateId { get; set; }
 
         public string? Gender { get; set; }
+
+        public Guid? CountryId { get; set; }
 
         public int? AllowedMinutesPerWeek { get; set; }
 
@@ -48,16 +50,5 @@ namespace ENyayPath.PICS.Core.Eny.Prisoner
         public Guid? ModifiedBy { get; set; }
 
         public DateTime? ModifiedDate { get; set; }
-        public string? SonOrDaughterOf { get; set; }
-
-        public string? MotherName { get; set; }
-
-        public string? SpouseName { get; set; }
-
-        public Guid? StateId { get; set; }
-
-        public string? Gender { get; set; }
-
-        public Guid? CountryId { get; set; }
     }
 }

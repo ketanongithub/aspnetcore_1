@@ -632,21 +632,13 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
                     b.Property<string>("PrisonerStatus")
                         .HasColumnType("nvarchar(max)");
 
-<<<<<<< HEAD
-                    b.Property<string>("SonDaughterOf")
-=======
                     b.Property<string>("SonOrDaughterOf")
->>>>>>> main
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SpouseName")
                         .HasColumnType("nvarchar(max)");
 
-<<<<<<< HEAD
                     b.Property<Guid?>("StateId")
-=======
-                    b.Property<Guid>("StateId")
->>>>>>> main
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -660,6 +652,7 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
             modelBuilder.Entity("ENyayPath.PICS.Core.Eny.Prisoner.PrisonerBiometricData", b =>
                 {
                     b.Property<Guid>("Id")
+
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("PrisonerBiometricDataId");
