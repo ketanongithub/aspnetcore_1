@@ -87,6 +87,17 @@ var app = builder.Build();
 
 app.UseRouting(); // If you are using routing middleware explicitly
 
+app.UseCors(builder =>
+{
+    builder
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .AllowCredentials()
+    .SetIsOriginAllowed((x) => true)
+    .WithOrigins("http://localhost:4200")
+    .WithOrigins("");
+});
+
 // 1. AUTHENTICATION FIRST (Who are you?)
 app.UseAuthentication();
 

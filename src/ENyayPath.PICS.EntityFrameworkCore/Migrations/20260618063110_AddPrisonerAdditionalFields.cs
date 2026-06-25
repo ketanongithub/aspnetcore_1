@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
 {
     /// <inheritdoc />
-    public partial class prisoner_newfields : Migration
+    public partial class AddPrisonerAdditionalFields : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -24,7 +24,7 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
-                name: "SonOrDaughterOf",
+                name: "SonDaughterOf",
                 table: "Prisoner",
                 type: "nvarchar(max)",
                 nullable: true);
@@ -39,8 +39,7 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
                 name: "StateId",
                 table: "Prisoner",
                 type: "uniqueidentifier",
-                nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+                nullable: true);
         }
 
         /// <inheritdoc />
@@ -55,7 +54,7 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
                 table: "Prisoner");
 
             migrationBuilder.DropColumn(
-                name: "SonOrDaughterOf",
+                name: "SonDaughterOf",
                 table: "Prisoner");
 
             migrationBuilder.DropColumn(

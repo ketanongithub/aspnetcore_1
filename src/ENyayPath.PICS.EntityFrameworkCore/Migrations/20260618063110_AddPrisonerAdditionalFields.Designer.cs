@@ -4,6 +4,7 @@ using ENyayPath.PICS.EntityFrameworkCore.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
 {
     [DbContext(typeof(PICSDbContext))]
-    partial class PICSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260618063110_AddPrisonerAdditionalFields")]
+    partial class AddPrisonerAdditionalFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -561,9 +564,6 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
                     b.Property<int?>("AllowedMinutesPerWeek")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("CountryId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -632,7 +632,7 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
                     b.Property<string>("PrisonerStatus")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SonOrDaughterOf")
+                    b.Property<string>("SonDaughterOf")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SpouseName")
@@ -652,7 +652,6 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
             modelBuilder.Entity("ENyayPath.PICS.Core.Eny.Prisoner.PrisonerBiometricData", b =>
                 {
                     b.Property<Guid>("Id")
-
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("PrisonerBiometricDataId");
@@ -909,69 +908,6 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
                     b.HasIndex("PrisonerContactPersonId");
 
                     b.ToTable("PrisonerContactPersonDocument");
-                });
-
-            modelBuilder.Entity("ENyayPath.PICS.Core.Eny.Prisoner.PrisonerDocument", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("PrisonerDocumentId");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("CreatorUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("DeleterUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("DocumentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("DocumentUploadLink")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<bool?>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsValidDocument")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("LastModifierUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("PrisonerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PrisonerId");
-
-                    b.ToTable("PrisonerDocuments");
                 });
 
             modelBuilder.Entity("ENyayPath.PICS.Core.Eny.Prisoner.Recharge", b =>
@@ -1847,16 +1783,6 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
                     b.HasOne("ENyayPath.PICS.Core.Eny.Prisoner.PrisonerContactPerson", null)
                         .WithMany()
                         .HasForeignKey("PrisonerContactPersonId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ENyayPath.PICS.Core.Eny.Prisoner.PrisonerDocument", b =>
-                {
-                    b.HasOne("ENyayPath.PICS.Core.Eny.Prisoner.Prisoner", null)
-                        .WithMany()
-                        .HasForeignKey("PrisonerId")
-                        .HasPrincipalKey("PrisonerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

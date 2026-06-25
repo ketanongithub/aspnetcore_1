@@ -111,7 +111,7 @@ namespace ENyayPath.PICS.Web.Helpers
                 var prop = task.GetType().GetProperty("Result");
                 return Results.Ok(prop?.GetValue(task));
             }
-            return Results.Ok(result);
+            return Results.Ok(result);  
         }
     }
 }

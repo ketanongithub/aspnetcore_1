@@ -22,4 +22,6 @@ namespace ENyayPath.PICS.Application.PrisonerContactDetail.Dtos
         public Guid? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
     }
+
+
 }

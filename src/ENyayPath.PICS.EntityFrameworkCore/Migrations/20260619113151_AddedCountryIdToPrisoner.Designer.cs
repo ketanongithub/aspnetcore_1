@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
 {
     [DbContext(typeof(PICSDbContext))]
-    [Migration("20260619024416_prisoner_newfields")]
-    partial class prisoner_newfields
+    [Migration("20260619113151_AddedCountryIdToPrisoner")]
+    partial class AddedCountryIdToPrisoner
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -564,6 +564,9 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
                     b.Property<int?>("AllowedMinutesPerWeek")
                         .HasColumnType("int");
 
+                    b.Property<Guid?>("CountryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -632,13 +635,13 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
                     b.Property<string>("PrisonerStatus")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SonOrDaughterOf")
+                    b.Property<string>("SonDaughterOf")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SpouseName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("StateId")
+                    b.Property<Guid?>("StateId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
