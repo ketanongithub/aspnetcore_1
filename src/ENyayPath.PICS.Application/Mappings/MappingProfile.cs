@@ -96,6 +96,10 @@ namespace ENyayPath.PICS.Application.Mappings
             // Wallet mappings
             CreateMap<Core.Eny.Prisoner.Wallet, WalletDto>()
                 .ForMember(dest => dest.WalletId, opt => opt.MapFrom(src => src.Id));
+
+            // PrisonerDocument mappings
+            CreateMap<Core.Eny.Prisoner.PrisonerDocument, Application.PrisonerDocument.Dtos.PrisonerDocumentDto>()
+                .ForMember(dest => dest.PrisonerDocumentId, opt => opt.MapFrom(src => src.Id));
         }
     }
 }

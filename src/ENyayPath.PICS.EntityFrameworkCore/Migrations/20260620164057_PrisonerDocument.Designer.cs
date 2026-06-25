@@ -4,6 +4,7 @@ using ENyayPath.PICS.EntityFrameworkCore.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
 {
     [DbContext(typeof(PICSDbContext))]
-    partial class PICSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260620164057_PrisonerDocument")]
+    partial class PrisonerDocument
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -561,9 +564,6 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
                     b.Property<int?>("AllowedMinutesPerWeek")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("CountryId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -632,21 +632,13 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
                     b.Property<string>("PrisonerStatus")
                         .HasColumnType("nvarchar(max)");
 
-<<<<<<< HEAD
-                    b.Property<string>("SonDaughterOf")
-=======
                     b.Property<string>("SonOrDaughterOf")
->>>>>>> main
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SpouseName")
                         .HasColumnType("nvarchar(max)");
 
-<<<<<<< HEAD
-                    b.Property<Guid?>("StateId")
-=======
                     b.Property<Guid>("StateId")
->>>>>>> main
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");

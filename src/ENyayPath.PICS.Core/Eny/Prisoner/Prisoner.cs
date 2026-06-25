@@ -48,8 +48,16 @@ namespace ENyayPath.PICS.Core.Eny.Prisoner
         public Guid? ModifiedBy { get; set; }
 
         public DateTime? ModifiedDate { get; set; }
+<<<<<<< HEAD
 
         public Guid? CountryId { get; set; }
 
+=======
+        public string? SonOrDaughterOf { get; set; }
+        public string? MotherName { get; set; }
+        public string? SpouseName { get; set; }
+        public Guid StateId { get; set; }
+        public string? Gender { get; set; }
+>>>>>>> main
     }
 }

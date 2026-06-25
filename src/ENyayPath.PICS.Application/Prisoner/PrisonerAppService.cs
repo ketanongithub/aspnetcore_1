@@ -68,6 +68,10 @@ namespace ENyayPath.PICS.Application.Prisoner
             prisoner.IsActive = input.IsActive;
             prisoner.ModifiedBy = Guid.Empty;
             prisoner.ModifiedDate = DateTime.UtcNow;
+            prisoner.SonOrDaughterOf = input.SonOrDaughterOf;
+            prisoner.MotherName = input.MotherName;
+            prisoner.Gender = input.Gender;
+            prisoner.StateId = input.StateId;
 
             var updated = await _prisonerRepository.UpdateAsync(prisoner);
             return _mapper.Map<PrisonerDto>(updated);
