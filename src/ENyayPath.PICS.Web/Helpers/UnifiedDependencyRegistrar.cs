@@ -116,7 +116,8 @@ namespace ENyayPath.PICS.Web.Helpers
                         mapped.Add(route);
 
                         var parameters = method.GetParameters();
-                        bool useBody = parameters.Length == 1 && !IsSimple(parameters[0].ParameterType);
+                        bool hasFormFile = parameters.Any(p => typeof(IFormFile).IsAssignableFrom(p.ParameterType));
+                        bool useBody = !hasFormFile && parameters.Length == 1 && !IsSimple(parameters[0].ParameterType);
                         var verb = GetHttpVerb(method, useBody);
                         
                         // Create a tag for Swagger grouping based on service name
@@ -133,7 +134,31 @@ namespace ENyayPath.PICS.Web.Helpers
                         var methodAuthAttr = method.GetCustomAttribute<AuthorizeAttribute>();
                         var authAttr = methodAuthAttr ?? classAuthAttr;  // Method-level overrides class-level
 
-                        if (verb == "GET")
+                        if (hasFormFile)
+                        {
+                            var mapPost = app.MapPost(route, GetFormDataHandler(method, parameters, iface, impl))
+                            .WithName(operationId)
+                            .WithTags(tag)
+                            .WithDescription(description)
+                            .WithSummary(method.Name)
+                            .Accepts<IFormFile>("multipart/form-data")
+                            .Produces(200, returnType)
+                            .DisableAntiforgery()
+                            .WithOpenApi();
+
+                            if (authAttr != null)
+                            {
+                                if (!string.IsNullOrEmpty(authAttr.Policy))
+                                {
+                                    mapPost.RequireAuthorization(authAttr.Policy);
+                                }
+                                else
+                                {
+                                    mapPost.RequireAuthorization();
+                                }
+                            }
+                        }
+                        else if (verb == "GET")
                         {
                             var mapGet = app.MapGet(route, GetHandler(method, parameters, iface, impl))
                             .WithName(operationId)
@@ -232,6 +257,58 @@ namespace ENyayPath.PICS.Web.Helpers
             {
                 var service = sp.GetService(iface) ?? ActivatorUtilities.CreateInstance(sp, impl);
                 var args = parameters.Select(p => ConvertQuery(ctx, p)).ToArray();
+                var result = method.Invoke(service, args);
+                return await ToResult(result);
+            });
+        }
+
+        private static Delegate GetFormDataHandler(MethodInfo method, ParameterInfo[] parameters, Type iface, Type impl)
+        {
+            return new Func<HttpContext, IServiceProvider, Task<IResult>>(async (ctx, sp) =>
+            {
+                var service = sp.GetService(iface) ?? ActivatorUtilities.CreateInstance(sp, impl);
+                var form = await ctx.Request.ReadFormAsync();
+                var args = new object[parameters.Length];
+
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    var p = parameters[i];
+                    if (typeof(IFormFile).IsAssignableFrom(p.ParameterType))
+                    {
+                        args[i] = form.Files.GetFile(p.Name) ?? form.Files.FirstOrDefault();
+                    }
+                    else if (!IsSimple(p.ParameterType))
+                    {
+                        var dto = Activator.CreateInstance(p.ParameterType);
+                        foreach (var prop in p.ParameterType.GetProperties())
+                        {
+                            var key = form.Keys.FirstOrDefault(k => k.Equals(prop.Name, StringComparison.OrdinalIgnoreCase));
+                            if (key == null) continue;
+                            var formValue = form[key].FirstOrDefault();
+                            if (formValue == null) continue;
+
+                            if (prop.PropertyType == typeof(Guid))
+                                prop.SetValue(dto, Guid.Parse(formValue));
+                            else if (prop.PropertyType == typeof(string))
+                                prop.SetValue(dto, formValue);
+                            else if (prop.PropertyType == typeof(int))
+                                prop.SetValue(dto, int.Parse(formValue));
+                            else if (prop.PropertyType == typeof(bool))
+                                prop.SetValue(dto, bool.Parse(formValue));
+                            else
+                                prop.SetValue(dto, Convert.ChangeType(formValue, prop.PropertyType));
+                        }
+                        args[i] = dto!;
+                    }
+                    else
+                    {
+                        var key = form.Keys.FirstOrDefault(k => k.Equals(p.Name, StringComparison.OrdinalIgnoreCase));
+                        var val = key != null ? form[key].FirstOrDefault() : null;
+                        args[i] = val != null ? Convert.ChangeType(val, p.ParameterType)
+                            : (p.ParameterType.IsValueType ? Activator.CreateInstance(p.ParameterType)! : null!);
+                    }
+                }
+
                 var result = method.Invoke(service, args);
                 return await ToResult(result);
             });
