@@ -11,5 +11,6 @@ namespace ENyayPath.PICS.Application.PrisonerDocument
         Task<PrisonerDocumentDto> UploadAsync(UploadPrisonerDocumentDto input, IFormFile file);
         Task<PrisonerDocumentDto> GetAsync(Guid id);
         Task<List<PrisonerDocumentDto>> GetAllAsync(Guid prisonerId);
+        Task<(Stream stream, string fileName, string contentType)> DownloadAsync(Guid id);
     }
 }

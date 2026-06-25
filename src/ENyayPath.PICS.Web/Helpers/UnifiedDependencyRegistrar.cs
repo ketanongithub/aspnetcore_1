@@ -469,6 +469,10 @@ namespace ENyayPath.PICS.Web.Helpers
                     var prop = task.GetType().GetProperty("Result");
                     var value = prop?.GetValue(task);
 
+                    // Handle file download: (Stream, string fileName, string contentType)
+                    var fileResult = TryGetFileResult(value);
+                    if (fileResult != null) return fileResult;
+
                     return Results.Ok(new
                     {
                         Success = true,
@@ -497,6 +501,26 @@ namespace ENyayPath.PICS.Web.Helpers
                     StackTrace = ex.StackTrace
                 });
             }
+        }
+
+        private static IResult? TryGetFileResult(object? value)
+        {
+            if (value == null) return null;
+            var type = value.GetType();
+            if (!type.IsGenericType || !type.Name.StartsWith("ValueTuple")) return null;
+
+            var fields = type.GetFields();
+            var streamField = fields.FirstOrDefault(f => typeof(Stream).IsAssignableFrom(f.FieldType));
+            if (streamField == null) return null;
+
+            var stream = streamField.GetValue(value) as Stream;
+            if (stream == null) return null;
+
+            var stringFields = fields.Where(f => f.FieldType == typeof(string)).ToArray();
+            var fileName = stringFields.Length > 0 ? stringFields[0].GetValue(value) as string ?? "download" : "download";
+            var contentType = stringFields.Length > 1 ? stringFields[1].GetValue(value) as string ?? "application/octet-stream" : "application/octet-stream";
+
+            return Results.File(stream, contentType, fileName);
         }
 
         private static Type GetUnwrappedReturnType(Type returnType)

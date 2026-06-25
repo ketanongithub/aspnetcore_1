@@ -83,5 +83,25 @@ namespace ENyayPath.PICS.Application.PrisonerDocument
             return _mapper.Map<List<PrisonerDocumentDto>>(docs);
         }
 
+        public async Task<(Stream stream, string fileName, string contentType)> DownloadAsync(Guid id)
+        {
+            var doc = await _docRepo.GetAsync(id);
+            if (doc == null || string.IsNullOrEmpty(doc.DocumentUploadLink))
+                throw new InvalidOperationException("Document not found");
+
+            var stream = await _fileStorage.OpenReadAsync(doc.DocumentUploadLink);
+            var fileName = Path.GetFileName(doc.DocumentUploadLink);
+            var ext = Path.GetExtension(fileName).ToLowerInvariant();
+            var contentType = ext switch
+            {
+                ".pdf" => "application/pdf",
+                ".png" => "image/png",
+                ".jpg" or ".jpeg" => "image/jpeg",
+                _ => "application/octet-stream"
+            };
+
+            return (stream, fileName, contentType);
+        }
+
     }
 }
