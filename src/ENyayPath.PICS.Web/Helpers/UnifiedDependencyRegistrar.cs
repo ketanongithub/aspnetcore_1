@@ -412,12 +412,49 @@ namespace ENyayPath.PICS.Web.Helpers
         }
 
 
-        private static object ConvertQuery(HttpContext ctx, ParameterInfo p)
+        private static object? ConvertQuery(HttpContext ctx, ParameterInfo p)
         {
             var val = ctx.Request.Query[p.Name].FirstOrDefault();
             if (val == null) return p.ParameterType.IsValueType ? Activator.CreateInstance(p.ParameterType)! : null!;
-            try { return Convert.ChangeType(val, p.ParameterType); }
-            catch { return val!; }
+
+            var targetType = p.ParameterType;
+            var underlyingType = Nullable.GetUnderlyingType(targetType) ?? targetType;
+
+            try
+            {
+                // Enums
+                if (underlyingType.IsEnum)
+                    return Enum.Parse(underlyingType, val, ignoreCase: true);
+
+                // GUIDs and TimeSpan
+                if (underlyingType == typeof(Guid))
+                    return Guid.Parse(val);
+                if (underlyingType == typeof(TimeSpan))
+                    return TimeSpan.Parse(val);
+
+                // Type converter for common types (int, bool, datetime, etc.)
+                var converter = System.ComponentModel.TypeDescriptor.GetConverter(underlyingType);
+                if (converter != null && converter.CanConvertFrom(typeof(string)))
+                    return converter.ConvertFromInvariantString(val);
+
+                // Fallback to ChangeType with invariant culture
+                return Convert.ChangeType(val, underlyingType, System.Globalization.CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                // If JSON can deserialize into complex reference types, try that
+                try
+                {
+                    if (!underlyingType.IsValueType && underlyingType != typeof(string))
+                    {
+                        return System.Text.Json.JsonSerializer.Deserialize(val, underlyingType);
+                    }
+                }
+                catch { }
+
+               // As a last resort return default for value types, or the raw string for reference types
+                return (underlyingType.IsValueType) ? Activator.CreateInstance(underlyingType)! : (object?)val;
+            }
         }
 
         private static async Task<IResult> ToResult(object? result)
