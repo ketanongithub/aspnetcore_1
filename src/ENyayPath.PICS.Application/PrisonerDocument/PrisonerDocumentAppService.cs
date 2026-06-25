@@ -77,5 +77,11 @@ namespace ENyayPath.PICS.Application.PrisonerDocument
             return _mapper.Map<PrisonerDocumentDto>(e);
         }
 
+        public async Task<List<PrisonerDocumentDto>> GetAllAsync(Guid prisonerId)
+        {
+            var docs = await _docRepo.GetAllListAsync(d => d.PrisonerId == prisonerId && d.IsActive == true);
+            return _mapper.Map<List<PrisonerDocumentDto>>(docs);
+        }
+
     }
 }
