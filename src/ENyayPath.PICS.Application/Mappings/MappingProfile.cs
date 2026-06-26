@@ -101,6 +101,9 @@ namespace ENyayPath.PICS.Application.Mappings
             //Prison
             CreateMap<Core.Eny.Prison.Prison, PrisonDto>()
                 .ForMember(dest => dest.PrisonId, opt => opt.MapFrom(src => src.Id));
+            // PrisonerDocument mappings
+            CreateMap<Core.Eny.Prisoner.PrisonerDocument, Application.PrisonerDocument.Dtos.PrisonerDocumentDto>()
+                .ForMember(dest => dest.PrisonerDocumentId, opt => opt.MapFrom(src => src.Id));
         }
     }
 }
