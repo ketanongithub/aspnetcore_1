@@ -7,12 +7,14 @@ using ENyayPath.PICS.Core.Eny.Common;
 using ENyayPath.PICS.Core.Repositories;
 using ENyayPath.PICS.Core.Services;
 using ENyayPath.PICS.Core.Sessions;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace ENyayPath.PICS.Application.Prison
 {
+    [Authorize]
     public class PrisonAppService : ApplicationService, IPrisonAppService
     {
         private readonly IRepository<Core.Eny.Prison.Prison, Guid> _prisonRepository;

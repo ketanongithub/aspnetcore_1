@@ -379,30 +379,42 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Seeds
         }
         public static async Task SeedPrisonAsync(PICSDbContext dbContext)
         {
+            if (!dbContext.Cities.Any())
+            {
+                Guid countryid = dbContext.Countries.Where(x => x.CountryName == "India").Select(x => x.Id).FirstOrDefault();
+                Guid stateid = dbContext.States.Where(x => x.StateName == "Delhi").Select(x => x.Id).FirstOrDefault();
+                var city = new CityMaster { CountryId = countryid, StateId = stateid, CityName = "Delhi" };
+                dbContext.Cities.Add(city);
+                dbContext.SaveChanges();
+
+            }
             if (!dbContext.Prisons.Any())
             {
                 Guid countryid = dbContext.Countries.Where(x => x.CountryName == "India").Select(x => x.Id).FirstOrDefault();
                 Guid stateid = dbContext.States.Where(x => x.StateName == "Delhi").Select(x => x.Id).FirstOrDefault();
+                Guid cityid = dbContext.Cities.Where(x => x.CityName == "Delhi").Select(x => x.Id).FirstOrDefault();
                 var prisons = new List<Prison>
                 {
-                    new Prison {PrisonId = new Guid(),PrisonName = "Central Jail 1 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId = stateid  },
-                    new Prison {PrisonId = new Guid(),PrisonName = "Central Jail 2 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid },
-                    new Prison {PrisonId = new Guid(),PrisonName = "Central Jail 3 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid },
-                    new Prison {PrisonId = new Guid(),PrisonName = "Central Jail 4 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid },
-                    new Prison {PrisonId = new Guid(),PrisonName = "Central Jail 5 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid},
-                    new Prison {PrisonId = new Guid(),PrisonName = "Central Jail 6 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid},
-                    new Prison {PrisonId = new Guid(),PrisonName = "Central Jail 7 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid},
-                    new Prison {PrisonId = new Guid(),PrisonName = "Central Jail 8 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid},
-                    new Prison {PrisonId = new Guid(),PrisonName = "Central Jail 9 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid},
-                    new Prison {PrisonId = new Guid(),PrisonName = "Central Jail 10 Rohini",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId = stateid  },
-                    new Prison {PrisonId = new Guid(),PrisonName = "Mandoli Jail 11",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid },
-                    new Prison {PrisonId = new Guid(),PrisonName = "Mandoli Jail 12",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid },
-                    new Prison {PrisonId = new Guid(),PrisonName = "Mandoli Jail 13",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid },
-                    new Prison {PrisonId = new Guid(),PrisonName = "Mandoli Jail 14",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid},
-                    new Prison {PrisonId = new Guid(),PrisonName = "Mandoli Jail 15",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid},
-                    new Prison {PrisonId = new Guid(),PrisonName = "Mandoli Jail 16",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid}
+                    new Prison {CityId = cityid,  PrisonName = "Central Jail 1 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId = stateid,PhoneNumber="1234567890"  },
+                    new Prison {CityId = cityid,PrisonName = "Central Jail 2 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid ,PhoneNumber="1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Central Jail 3 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid ,PhoneNumber="1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Central Jail 4 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid , PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Central Jail 5 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Central Jail 6 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Central Jail 7 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Central Jail 8 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Central Jail 9 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Central Jail 10 Rohini",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId = stateid  , PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Mandoli Jail 11",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid , PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Mandoli Jail 12",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid , PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Mandoli Jail 13",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid , PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Mandoli Jail 14",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Mandoli Jail 15",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Mandoli Jail 16",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"}
        
                 };
+                dbContext.AddRange(prisons);
+                dbContext.SaveChanges();
             }
         }
     }
