@@ -1,4 +1,5 @@
 using ENyayPath.PICS.Application.PrisonerContactPerson.Dtos;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,6 +10,6 @@ namespace ENyayPath.PICS.Application.PrisonerContactPerson
     {
         Task<List<PrisonerContactPersonDto>> GetAllAsync();
         Task<PrisonerContactPersonDto> GetAsync(Guid id);
-        Task<CreatePrisonerContactPersonDto> CreateAsync(CreatePrisonerContactPersonDto input);
+        Task<CreatePrisonerContactPersonDto> CreateAsync(CreatePrisonerContactPersonDto input, List<IFormFile> files);
     }
 }

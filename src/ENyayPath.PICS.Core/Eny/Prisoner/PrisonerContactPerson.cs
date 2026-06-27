@@ -17,7 +17,8 @@ namespace ENyayPath.PICS.Core.Eny.Prisoner
         [Required]
         [StringLength(100)]
         public string ContactPersonName { get; set; } = null!;
-
+        [Required]
+        public string SonDaughterOf { get; set; } = null!;
         [Required]
         [StringLength(50)]
         public string Relation { get; set; } = null!;

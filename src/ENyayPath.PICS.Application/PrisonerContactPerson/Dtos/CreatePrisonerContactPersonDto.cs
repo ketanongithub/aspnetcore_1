@@ -12,11 +12,14 @@ namespace ENyayPath.PICS.Application.PrisonerContactPerson.Dtos
         [Required]
         public string? ContactPersonName { get; set; }
         [Required]
+        public string? SonDaughterOf { get; set; }
+        [Required]
         public string? Relation { get; set; }
         [Required]
         public string? PhoneNumber { get; set; }
         public string? PhoneNumberPrefix { get; set; }
         public bool IsAudioCall { get; set; }
+        public bool IsVideoCall { get; set; }
         public string? AppId { get; set; }
         public string? RegisteredName { get; set; }
         public List<UploadDocumentDto>? Documents { get; set; } = new List<UploadDocumentDto>();   
