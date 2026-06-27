@@ -11,5 +11,6 @@ namespace ENyayPath.PICS.Application.PrisonerContactPerson
         Task<List<PrisonerContactPersonDto>> GetAllAsync();
         Task<PrisonerContactPersonDto> GetAsync(Guid id);
         Task<CreatePrisonerContactPersonDto> CreateAsync(CreatePrisonerContactPersonDto input, List<IFormFile> files);
+        Task<PrisonerContactPersonAllDto> GetByPrisonerIdAsync(Guid PrisonerID, bool IsAudioCall);
     }
 }

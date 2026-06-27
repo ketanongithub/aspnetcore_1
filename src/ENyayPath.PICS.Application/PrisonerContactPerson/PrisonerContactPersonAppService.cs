@@ -21,6 +21,7 @@ namespace ENyayPath.PICS.Application.PrisonerContactPerson
         private readonly IRepository<Core.Eny.Prisoner.PrisonerContactPerson, Guid> _contactPersonRepo;
         private readonly IRepository<Core.Eny.Prisoner.PrisonerContactDetail, Guid> _contactDetailRepo;
         private readonly IRepository<Core.Eny.Prisoner.PrisonerContactPersonDocument, Guid> _contactDocRepo;
+        private readonly IRepository<Core.Eny.Common.DocumentMaster, Guid> _documentMasterRepo;
         private readonly IFileStorageService _fileStorage;
         private readonly IMapper _mapper;
 
@@ -28,6 +29,8 @@ namespace ENyayPath.PICS.Application.PrisonerContactPerson
             IRepository<Core.Eny.Prisoner.PrisonerContactPerson, Guid> contactPersonRep,
             IRepository<Core.Eny.Prisoner.PrisonerContactDetail, Guid> contactDetailRepo,
             IRepository<Core.Eny.Prisoner.PrisonerContactPersonDocument, Guid> contactDocRepo,
+            IRepository<Core.Eny.Common.DocumentMaster, Guid> documentMasterRepo,
+        IFileStorageService fileStorage,
             IMapper mapper,
             IAppSession appSession)
             : base(appSession)
@@ -35,6 +38,8 @@ namespace ENyayPath.PICS.Application.PrisonerContactPerson
             _contactPersonRepo = contactPersonRep;
             _contactDetailRepo = contactDetailRepo;
             _contactDocRepo = contactDocRepo;
+            _documentMasterRepo = documentMasterRepo;
+            _fileStorage = fileStorage;
             _mapper = mapper;
         }
 
@@ -51,6 +56,8 @@ namespace ENyayPath.PICS.Application.PrisonerContactPerson
         }
         public async Task<CreatePrisonerContactPersonDto> CreateAsync(CreatePrisonerContactPersonDto input, List<IFormFile> files)
         {
+            if (input == null) throw new ArgumentNullException(nameof(input));
+            files ??= new List<IFormFile>();
             // Validation: only one ContactPhoneNumber per Prisoner
             var existingAudioDetails = (from Person in _contactPersonRepo.GetAll()
                                   join Detail in _contactDetailRepo.GetAll()
@@ -95,29 +102,37 @@ namespace ENyayPath.PICS.Application.PrisonerContactPerson
 
             var insertedDetail = await _contactDetailRepo.InsertAsync(contactDetail);
             
-            if ( files != null && files.Count > 0)
+            for (int i = 0; i < files.Count; i++)
             {
-                int counter = 0;
-                foreach (var file in files)
+                var file = files[i];
+                // Basic validations
+                var allowed = new[] { ".pdf", ".png", ".jpg", ".jpeg" };
+                var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+                if (!Array.Exists(allowed, e => e == ext)) throw new InvalidOperationException("Invalid file type");
+                const long maxBytes = 10 * 1024 * 1024;
+                if (file.Length > maxBytes) throw new InvalidOperationException("File too large");
+                // Save file
+                var Filename = insertedDetail.Id.ToString().Replace("-","");
+                var relativePath = await _fileStorage.SaveAsync(file, $"prisonerContact-docs/{Filename}");
+
+                var hasDocEntry = input.Documents != null && i < input.Documents.Count;
+                List<Guid> doclist = new List<Guid>();
+                if (!hasDocEntry)
                 {
-                    // Basic validations
-                    var allowed = new[] { ".pdf", ".png", ".jpg", ".jpeg" };
-                    var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-                    if (!Array.Exists(allowed, e => e == ext)) throw new InvalidOperationException("Invalid file type");
-                    const long maxBytes = 10 * 1024 * 1024;
-                    if (file.Length > maxBytes) throw new InvalidOperationException("File too large");
-                    // Save file
-                    var relativePath = await _fileStorage.SaveAsync(file, $"prisonerContact-docs/{insertedDetail.Id}");
-                    var insertedDoc = await _contactDocRepo.InsertAsync(new Core.Eny.Prisoner.PrisonerContactPersonDocument
-                    {
-                        PrisonerContactPersonId = insertedDetail.Id,
-                        DocumentId = input.Documents[counter].DocumentId, // Assuming a new DocumentId is generated for each file
-                        DocumentUploadLink = relativePath,
-                        DocumentName = file.FileName,
-                        IsValidDocument = true // Assuming the uploaded document is valid by default
-                    });
-                    counter++;
+                    var docMaster = await _documentMasterRepo.GetAllAsync();
+                    doclist = docMaster.ToList().Take(files.Count()).Select(x=>x.Id).ToList();
+                    if (docMaster == null) throw new InvalidOperationException($"DocumentMaster with ID {input.Documents[i].DocumentId} not found");
                 }
+                var docid = hasDocEntry ? input.Documents[i].DocumentId : doclist[i];
+                var IsValid = hasDocEntry ? input.Documents[i].IsValidDocument : false;
+                var insertedDoc = await _contactDocRepo.InsertAsync(new Core.Eny.Prisoner.PrisonerContactPersonDocument
+                {
+                    PrisonerContactPersonId = insertedPerson.Id,
+                    DocumentId = docid,
+                    DocumentUploadLink = relativePath,
+                    DocumentName = file.FileName,
+                    IsValidDocument = IsValid
+                });
             }
            
 
@@ -128,9 +143,18 @@ namespace ENyayPath.PICS.Application.PrisonerContactPerson
                 PhoneNumber = insertedDetail.PhoneNumber,
                 PhoneNumberPrefix = insertedDetail.PhoneNumberPrefix,
                 AppId = insertedDetail.AppId,
-                RegisteredName = insertedDetail.RegisteredName,
-                Documents = input.Documents
+                RegisteredName = insertedDetail.RegisteredName
+                //Documents = input.Documents
             };
+        }
+        public async Task<PrisonerContactPersonAllDto> GetByPrisonerIdAsync(Guid PrisonerID, bool IsAudioCall)
+        {
+            PrisonerContactPersonAllDto PrisonContactdetails = new PrisonerContactPersonAllDto();
+            PrisonContactdetails.Person = _contactPersonRepo.GetAll().Where(x => x.PrisonerId == PrisonerID).FirstOrDefault();
+            PrisonContactdetails.Detail = _contactDetailRepo.GetAll().Where(x => x.PrisonerContactPersonId == PrisonContactdetails.Person.Id && x.IsAudioCall == IsAudioCall).FirstOrDefault();
+            PrisonContactdetails.Documents =  _contactDocRepo.GetAll().Where(x=>x.PrisonerContactPersonId == PrisonContactdetails.Detail.Id).ToList();
+
+            return PrisonContactdetails;
         }
     }
 }
