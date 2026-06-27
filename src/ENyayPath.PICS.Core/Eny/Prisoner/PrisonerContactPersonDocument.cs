@@ -18,7 +18,7 @@ namespace ENyayPath.PICS.Core.Eny.Prisoner
 
         [StringLength(500)]
         public string? DocumentUploadLink { get; set; }
-
+        public string? DocumentName { get; set; }
         public bool? IsValidDocument { get; set; } = false;
 
         public bool? IsActive { get; set; } = true;
