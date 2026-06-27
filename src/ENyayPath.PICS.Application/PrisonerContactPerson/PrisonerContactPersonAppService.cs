@@ -94,8 +94,10 @@ namespace ENyayPath.PICS.Application.PrisonerContactPerson
             };
 
             var insertedDetail = await _contactDetailRepo.InsertAsync(contactDetail);
-            if( files != null && files.Count > 0)
+            
+            if ( files != null && files.Count > 0)
             {
+                int counter = 0;
                 foreach (var file in files)
                 {
                     // Basic validations
@@ -109,11 +111,12 @@ namespace ENyayPath.PICS.Application.PrisonerContactPerson
                     var insertedDoc = await _contactDocRepo.InsertAsync(new Core.Eny.Prisoner.PrisonerContactPersonDocument
                     {
                         PrisonerContactPersonId = insertedDetail.Id,
-                        DocumentId = Guid.NewGuid(), // Assuming a new DocumentId is generated for each file
+                        DocumentId = input.Documents[counter].DocumentId, // Assuming a new DocumentId is generated for each file
                         DocumentUploadLink = relativePath,
                         DocumentName = file.FileName,
                         IsValidDocument = true // Assuming the uploaded document is valid by default
                     });
+                    counter++;
                 }
             }
            
