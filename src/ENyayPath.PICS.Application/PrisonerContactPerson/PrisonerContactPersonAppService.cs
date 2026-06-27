@@ -28,6 +28,7 @@ namespace ENyayPath.PICS.Application.PrisonerContactPerson
             IRepository<Core.Eny.Prisoner.PrisonerContactPerson, Guid> contactPersonRep,
             IRepository<Core.Eny.Prisoner.PrisonerContactDetail, Guid> contactDetailRepo,
             IRepository<Core.Eny.Prisoner.PrisonerContactPersonDocument, Guid> contactDocRepo,
+            IFileStorageService fileStorage,
             IMapper mapper,
             IAppSession appSession)
             : base(appSession)
@@ -35,6 +36,7 @@ namespace ENyayPath.PICS.Application.PrisonerContactPerson
             _contactPersonRepo = contactPersonRep;
             _contactDetailRepo = contactDetailRepo;
             _contactDocRepo = contactDocRepo;
+            _fileStorage = fileStorage;
             _mapper = mapper;
         }
 
@@ -51,6 +53,7 @@ namespace ENyayPath.PICS.Application.PrisonerContactPerson
         }
         public async Task<CreatePrisonerContactPersonDto> CreateAsync(CreatePrisonerContactPersonDto input, List<IFormFile> files)
         {
+            if(input ==null || files == null) throw new ArgumentNullException(nameof(input));
             // Validation: only one ContactPhoneNumber per Prisoner
             var existingAudioDetails = (from Person in _contactPersonRepo.GetAll()
                                   join Detail in _contactDetailRepo.GetAll()
@@ -95,7 +98,7 @@ namespace ENyayPath.PICS.Application.PrisonerContactPerson
 
             var insertedDetail = await _contactDetailRepo.InsertAsync(contactDetail);
             
-            if ( files != null && files.Count > 0)
+            if ( files != null && files.Count() > 0)
             {
                 int counter = 0;
                 foreach (var file in files)
@@ -107,7 +110,8 @@ namespace ENyayPath.PICS.Application.PrisonerContactPerson
                     const long maxBytes = 10 * 1024 * 1024;
                     if (file.Length > maxBytes) throw new InvalidOperationException("File too large");
                     // Save file
-                    var relativePath = await _fileStorage.SaveAsync(file, $"prisonerContact-docs/{insertedDetail.Id}");
+                    var Filename = insertedDetail.Id.ToString().Replace("-","");
+                    var relativePath = await _fileStorage.SaveAsync(file, $"prisonerContact-docs/{Filename}");
                     var insertedDoc = await _contactDocRepo.InsertAsync(new Core.Eny.Prisoner.PrisonerContactPersonDocument
                     {
                         PrisonerContactPersonId = insertedDetail.Id,
@@ -131,6 +135,15 @@ namespace ENyayPath.PICS.Application.PrisonerContactPerson
                 RegisteredName = insertedDetail.RegisteredName,
                 Documents = input.Documents
             };
+        }
+        public async Task<PrisonerContactPersonAllDto> GetByPrisonerIdAsync(Guid PrisonerID, bool IsAudioCall)
+        {
+            PrisonerContactPersonAllDto PrisonContactdetails = new PrisonerContactPersonAllDto();
+            PrisonContactdetails.Person = _contactPersonRepo.GetAll().Where(x => x.PrisonerId == PrisonerID).FirstOrDefault();
+            PrisonContactdetails.Detail = _contactDetailRepo.GetAll().Where(x => x.PrisonerContactPersonId == PrisonContactdetails.Person.Id && x.IsAudioCall == IsAudioCall).FirstOrDefault();
+            PrisonContactdetails.Documents =  _contactDocRepo.GetAll().Where(x=>x.PrisonerContactPersonId == PrisonContactdetails.Detail.Id).ToList();
+
+            return PrisonContactdetails;
         }
     }
 }
