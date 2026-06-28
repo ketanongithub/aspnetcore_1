@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using ENyayPath.PICS.Application.Prisoner;
 using ENyayPath.PICS.Application.PrisonerDocument.Dtos;
 using ENyayPath.PICS.Application.Services;
@@ -76,6 +76,32 @@ namespace ENyayPath.PICS.Application.PrisonerDocument
             var e = await _docRepo.GetAsync(id);
             return _mapper.Map<PrisonerDocumentDto>(e);
         }
-        
+
+        public async Task<List<PrisonerDocumentDto>> GetAllAsync(Guid prisonerId)
+        {
+            var docs = await _docRepo.GetAllListAsync(d => d.PrisonerId == prisonerId && d.IsActive == true);
+            return _mapper.Map<List<PrisonerDocumentDto>>(docs);
+        }
+
+        public async Task<(Stream stream, string fileName, string contentType)> DownloadAsync(Guid id)
+        {
+            var doc = await _docRepo.GetAsync(id);
+            if (doc == null || string.IsNullOrEmpty(doc.DocumentUploadLink))
+                throw new InvalidOperationException("Document not found");
+
+            var stream = await _fileStorage.OpenReadAsync(doc.DocumentUploadLink);
+            var fileName = Path.GetFileName(doc.DocumentUploadLink);
+            var ext = Path.GetExtension(fileName).ToLowerInvariant();
+            var contentType = ext switch
+            {
+                ".pdf" => "application/pdf",
+                ".png" => "image/png",
+                ".jpg" or ".jpeg" => "image/jpeg",
+                _ => "application/octet-stream"
+            };
+
+            return (stream, fileName, contentType);
+        }
+
     }
 }
