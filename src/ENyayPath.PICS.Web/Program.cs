@@ -87,7 +87,8 @@ builder.Services.AddCors(options =>
                     ?? new[] { "http://localhost:4200" })
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowCredentials()
+              .WithExposedHeaders("Content-Disposition");
     });
 });
 
