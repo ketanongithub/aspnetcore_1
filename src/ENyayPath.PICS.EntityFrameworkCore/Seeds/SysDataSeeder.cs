@@ -379,20 +379,67 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Seeds
         }
         public static async Task SeedPrisonAsync(PICSDbContext dbContext)
         {
+            // Ensure Delhi city exists and its country/state parents exist
             if (!dbContext.Cities.Any())
             {
-                Guid countryid = dbContext.Countries.Where(x => x.CountryName == "India").Select(x => x.Id).FirstOrDefault();
-                Guid stateid = dbContext.States.Where(x => x.StateName == "Delhi").Select(x => x.Id).FirstOrDefault();
-                var city = new CityMaster { CountryId = countryid, StateId = stateid, CityName = "Delhi" };
-                dbContext.Cities.Add(city);
-                dbContext.SaveChanges();
+                var country = dbContext.Countries.FirstOrDefault(x => x.CountryName == "India");
+                if (country == null)
+                {
+                    country = new CountryMaster { Id = Guid.NewGuid(), CountryCode = "IN", CountryName = "India", IsSetTopInList = true, IsActive = true, CreatedDate = DateTime.Now };
+                    dbContext.Countries.Add(country);
+                    await dbContext.SaveChangesAsync();
+                }
 
+                var state = dbContext.States.FirstOrDefault(x => x.StateName == "Delhi");
+                if (state == null)
+                {
+                    state = new StateMaster { CountryId = country.Id, StateCode = "DL", StateName = "Delhi", IsActive = true, CreatedDate = DateTime.Now };
+                    dbContext.States.Add(state);
+                    await dbContext.SaveChangesAsync();
+                }
+
+                var city = dbContext.Cities.FirstOrDefault(x => x.CityName == "Delhi");
+                if (city == null)
+                {
+                    city = new CityMaster { CountryId = country.Id, StateId = state.Id, CityName = "Delhi" };
+                    dbContext.Cities.Add(city);
+                    await dbContext.SaveChangesAsync();
+                }
             }
+
             if (!dbContext.Prisons.Any())
             {
-                Guid countryid = dbContext.Countries.Where(x => x.CountryName == "India").Select(x => x.Id).FirstOrDefault();
-                Guid stateid = dbContext.States.Where(x => x.StateName == "Delhi").Select(x => x.Id).FirstOrDefault();
-                Guid cityid = dbContext.Cities.Where(x => x.CityName == "Delhi").Select(x => x.Id).FirstOrDefault();
+                var country = dbContext.Countries.FirstOrDefault(x => x.CountryName == "India");
+                var state = dbContext.States.FirstOrDefault(x => x.StateName == "Delhi");
+                var city = dbContext.Cities.FirstOrDefault(x => x.CityName == "Delhi");
+
+                if (country == null || state == null || city == null)
+                {
+                    if (country == null)
+                    {
+                        country = new CountryMaster { Id = Guid.NewGuid(), CountryCode = "IN", CountryName = "India", IsSetTopInList = true, IsActive = true, CreatedDate = DateTime.Now };
+                        dbContext.Countries.Add(country);
+                    }
+                    if (state == null)
+                    {
+                        var countryIdForState = country?.Id ?? dbContext.Countries.Where(x => x.CountryName == "India").Select(x => x.Id).FirstOrDefault();
+                        state = new StateMaster { CountryId = countryIdForState, StateCode = "DL", StateName = "Delhi", IsActive = true, CreatedDate = DateTime.Now };
+                        dbContext.States.Add(state);
+                    }
+                    if (city == null)
+                    {
+                        var stateIdForCity = state?.Id ?? dbContext.States.Where(x => x.StateName == "Delhi").Select(x => x.Id).FirstOrDefault();
+                        var countryIdForCity = country?.Id ?? dbContext.Countries.Where(x => x.CountryName == "India").Select(x => x.Id).FirstOrDefault();
+                        city = new CityMaster { CountryId = countryIdForCity, StateId = stateIdForCity, CityName = "Delhi" };
+                        dbContext.Cities.Add(city);
+                    }
+
+                    await dbContext.SaveChangesAsync();
+                }
+
+                var cityid = city.Id;
+                var countryid = country.Id;
+                var stateid = state.Id;
                 var prisons = new List<Prison>
                 {
                     new Prison {CityId = cityid,  PrisonName = "Central Jail 1 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId = stateid,PhoneNumber="1234567890"  },
@@ -411,10 +458,10 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Seeds
                     new Prison {CityId = cityid, PrisonName = "Mandoli Jail 14",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"},
                     new Prison {CityId = cityid, PrisonName = "Mandoli Jail 15",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"},
                     new Prison {CityId = cityid, PrisonName = "Mandoli Jail 16",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"}
-       
+
                 };
                 dbContext.AddRange(prisons);
-                dbContext.SaveChanges();
+                await dbContext.SaveChangesAsync();
             }
         }
     }
