@@ -78,6 +78,19 @@ builder.Services.AddAutoMapper(cfg =>
 // Auto-register application services by scanning project assemblies
 UnifiedDependencyRegistrar.Register(builder.Services);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DefaultCorsPolicy", policy =>
+    {
+        policy.WithOrigins(
+                builder.Configuration.GetSection("App:CorsOrigins").Get<string[]>()
+                    ?? new[] { "http://localhost:4200" })
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -86,7 +99,7 @@ AuthConfigurer.Configure(builder.Services, builder.Configuration);
 var app = builder.Build();
 
 app.UseRouting(); // If you are using routing middleware explicitly
-
+app.UseCors("DefaultCorsPolicy");
 // 1. AUTHENTICATION FIRST (Who are you?)
 app.UseAuthentication();
 
@@ -102,6 +115,10 @@ using (var scope = app.Services.CreateScope())
     await SysDataSeeder.SeedAsync(dbContext);               // Editions, Tenants, Features
     await SysDataSeeder.SeedLanguagesAsync(dbContext);      // Languages + translations
     await SysDataSeeder.SeedSettingsAsync(dbContext);       // System settings
+    await SysDataSeeder.DocumentAsync(dbContext);          // DocumentMaster
+    await SysDataSeeder.SeedCountryAsync(dbContext);        // Countries    
+    await SysDataSeeder.SeedStateAsync(dbContext);          //states
+    await SysDataSeeder.SeedPrisonAsync(dbContext);      // Prisoners
 
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();

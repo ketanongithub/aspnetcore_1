@@ -2,6 +2,9 @@
 using ENyayPath.PICS.Core.Authorization.Roles;
 using ENyayPath.PICS.Core.Authorization.Users;
 using ENyayPath.PICS.Core.Editions;
+using ENyayPath.PICS.Core.Eny.Common;
+using ENyayPath.PICS.Core.Eny.Prison;
+using ENyayPath.PICS.Core.Eny.Prisoner;
 using ENyayPath.PICS.Core.Features;
 using ENyayPath.PICS.Core.Localization;
 using ENyayPath.PICS.Core.MultiTenancy;
@@ -11,8 +14,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 using System.Security.Claims;
 using System.Text;
+using System.Xml.Linq;
 
 namespace ENyayPath.PICS.EntityFrameworkCore.Seeds
 {
@@ -105,7 +110,8 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Seeds
             }
         }
 
-        public static async Task SeedIdentityAsync(UserManager<User> userManager, RoleManager<Role> roleManager)
+        public static async Task
+            SeedIdentityAsync(UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             // --- Ensure SuperAdmin Role ---
             var superAdminRole = await roleManager.FindByNameAsync("SuperAdmin");
@@ -134,7 +140,18 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Seeds
             {
                 await roleManager.CreateAsync(new Role { Name = "Admin", Description = "System Administrator" });
             }
-
+            if (!await roleManager.RoleExistsAsync("JailAdmin"))
+            {
+                await roleManager.CreateAsync(new Role { Name = "JailAdmin", Description = "Jail Administrator" });
+            }
+            if (!await roleManager.RoleExistsAsync("Prisoner"))
+            {
+                await roleManager.CreateAsync(new Role { Name = "Prisoner", Description = "Prisoner" });
+            }
+            if (!await roleManager.RoleExistsAsync("PrisonerFamily"))
+            {
+                await roleManager.CreateAsync(new Role { Name = "PrisonerFamily", Description = "Prisoner Family" });
+            }
             // Create Admin user
             var adminUser = await userManager.FindByEmailAsync("admin@default.local");
             if (adminUser == null)
@@ -246,6 +263,204 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Seeds
                 };
 
                 dbContext.Settings.AddRange(systemSettings);
+                await dbContext.SaveChangesAsync();
+            }
+        }
+        public static async Task DocumentAsync(PICSDbContext dbContext)
+        {
+            if (!dbContext.Documents.Any())
+            {
+                var documents = new List<DocumentMaster>
+                {
+                    new DocumentMaster
+                    {
+                       DocumentName = "Prisoner",
+                       Description = "Photo",
+                       IsActive = true,
+                       CreatedDate = DateTime.Now
+                    },
+                     new DocumentMaster
+                    {
+                       Id = new Guid(),
+                       DocumentName = "Aadhaar",
+                       Description = "Aadhaar Card issued by UIDAI",
+                       IsActive = true,
+                       CreatedDate = DateTime.Now
+                    },
+                     new DocumentMaster
+                    {
+                         Id=new Guid(),
+                       DocumentName = "Driving Licence",
+                       Description = "Driving Licence issued by Transport Department",
+                       IsActive = true,
+                       CreatedDate = DateTime.Now
+                    },
+                      new DocumentMaster
+                    {
+                        Id= new Guid(),
+                       DocumentName = "Passport",
+                       Description = "Passport issued by Government",
+                       IsActive = true,
+                       CreatedDate = DateTime.Now
+                    },
+                        new DocumentMaster
+                    {
+                        Id= new Guid(),
+                       DocumentName = "Other Documents",
+                       Description = "Any other valid supporting documen",
+                       IsActive = true,
+                       CreatedDate = DateTime.Now
+                    }
+                };
+
+                dbContext.Documents.AddRange(documents);
+                await dbContext.SaveChangesAsync();
+            }
+        }
+        public static async Task SeedCountryAsync(PICSDbContext dbContext)
+        {
+            if (!dbContext.Countries.Any())
+            {
+                var countries = new List<CountryMaster>
+                {
+                    new CountryMaster { Id = new Guid(), CountryCode = "IN", CountryName = "India", IsSetTopInList = true, IsActive = true, CreatedDate = DateTime.Now },
+                    new CountryMaster { Id = new Guid(), CountryCode = "US", CountryName = "United States", IsSetTopInList = false, IsActive = true, CreatedDate = DateTime.Now },
+                    new CountryMaster { Id = new Guid(), CountryCode = "GB", CountryName = "United Kingdom", IsSetTopInList = false, IsActive = true, CreatedDate = DateTime.Now },
+                    new CountryMaster { Id = new Guid(), CountryCode = "CA", CountryName = "Canada", IsSetTopInList = false, IsActive = true, CreatedDate = DateTime.Now },
+                    new CountryMaster { Id = new Guid(), CountryCode = "AU", CountryName = "Australia", IsSetTopInList = false, IsActive = true, CreatedDate = DateTime.Now }
+                };
+                dbContext.Countries.AddRange(countries);
+                await dbContext.SaveChangesAsync();
+            }
+        }
+        public static async Task SeedStateAsync(PICSDbContext dbContext)
+        {
+            if (!dbContext.States.Any())
+            {
+                Guid countryid = dbContext.Countries.Where(x => x.CountryName == "India").Select(x => x.Id).FirstOrDefault();
+                var states = new List<StateMaster>
+                {
+                    new StateMaster {  CountryId = countryid, StateCode = "MH", StateName = "Maharashtra", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster {  CountryId = countryid, StateCode = "DL", StateName = "Delhi", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster {  CountryId = countryid, StateCode = "KA", StateName = "Karnataka", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "TN", StateName = "Tamil Nadu", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "UP", StateName = "Uttar Pradesh", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "GJ", StateName = "Gujarat", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "RJ", StateName = "Rajasthan", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "WB", StateName = "West Bengal", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "PB", StateName = "Punjab", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "KL", StateName = "Kerala", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "AP", StateName = "Andhra Pradesh", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "TG", StateName = "Telangana", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "HR", StateName = "Haryana", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "JH", StateName = "Jharkhand", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "OR", StateName = "Odisha", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "CH", StateName = "Chhattisgarh", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "HP", StateName = "Himachal Pradesh", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "JK", StateName = "Jammu and Kashmir", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "AS", StateName = "Assam", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "BR", StateName = "Bihar", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "MN", StateName = "Manipur", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "ML", StateName = "Meghalaya", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "MZ", StateName = "Mizoram", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "NL", StateName = "Nagaland", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "SK", StateName = "Sikkim", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "TR", StateName = "Tripura", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "AR", StateName = "Arunachal Pradesh", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "GA", StateName = "Goa", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "LD", StateName = "Lakshadweep", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "PY", StateName = "Puducherry", IsActive = true, CreatedDate = DateTime.Now },
+                    new StateMaster { CountryId = countryid, StateCode = "DN", StateName = "Dadra and Nagar Haveli and Daman and Diu", IsActive = true, CreatedDate = DateTime.Now }                    
+                };
+                 dbContext.States.AddRange(states);
+                await dbContext.SaveChangesAsync();
+            }
+
+        }
+        public static async Task SeedPrisonAsync(PICSDbContext dbContext)
+        {
+            // Ensure Delhi city exists and its country/state parents exist
+            if (!dbContext.Cities.Any())
+            {
+                var country = dbContext.Countries.FirstOrDefault(x => x.CountryName == "India");
+                if (country == null)
+                {
+                    country = new CountryMaster { Id = Guid.NewGuid(), CountryCode = "IN", CountryName = "India", IsSetTopInList = true, IsActive = true, CreatedDate = DateTime.Now };
+                    dbContext.Countries.Add(country);
+                    await dbContext.SaveChangesAsync();
+                }
+
+                var state = dbContext.States.FirstOrDefault(x => x.StateName == "Delhi");
+                if (state == null)
+                {
+                    state = new StateMaster { CountryId = country.Id, StateCode = "DL", StateName = "Delhi", IsActive = true, CreatedDate = DateTime.Now };
+                    dbContext.States.Add(state);
+                    await dbContext.SaveChangesAsync();
+                }
+
+                var city = dbContext.Cities.FirstOrDefault(x => x.CityName == "Delhi");
+                if (city == null)
+                {
+                    city = new CityMaster { CountryId = country.Id, StateId = state.Id, CityName = "Delhi" };
+                    dbContext.Cities.Add(city);
+                    await dbContext.SaveChangesAsync();
+                }
+            }
+
+            if (!dbContext.Prisons.Any())
+            {
+                var country = dbContext.Countries.FirstOrDefault(x => x.CountryName == "India");
+                var state = dbContext.States.FirstOrDefault(x => x.StateName == "Delhi");
+                var city = dbContext.Cities.FirstOrDefault(x => x.CityName == "Delhi");
+
+                if (country == null || state == null || city == null)
+                {
+                    if (country == null)
+                    {
+                        country = new CountryMaster { Id = Guid.NewGuid(), CountryCode = "IN", CountryName = "India", IsSetTopInList = true, IsActive = true, CreatedDate = DateTime.Now };
+                        dbContext.Countries.Add(country);
+                    }
+                    if (state == null)
+                    {
+                        var countryIdForState = country?.Id ?? dbContext.Countries.Where(x => x.CountryName == "India").Select(x => x.Id).FirstOrDefault();
+                        state = new StateMaster { CountryId = countryIdForState, StateCode = "DL", StateName = "Delhi", IsActive = true, CreatedDate = DateTime.Now };
+                        dbContext.States.Add(state);
+                    }
+                    if (city == null)
+                    {
+                        var stateIdForCity = state?.Id ?? dbContext.States.Where(x => x.StateName == "Delhi").Select(x => x.Id).FirstOrDefault();
+                        var countryIdForCity = country?.Id ?? dbContext.Countries.Where(x => x.CountryName == "India").Select(x => x.Id).FirstOrDefault();
+                        city = new CityMaster { CountryId = countryIdForCity, StateId = stateIdForCity, CityName = "Delhi" };
+                        dbContext.Cities.Add(city);
+                    }
+
+                    await dbContext.SaveChangesAsync();
+                }
+
+                var cityid = city.Id;
+                var countryid = country.Id;
+                var stateid = state.Id;
+                var prisons = new List<Prison>
+                {
+                    new Prison {CityId = cityid,  PrisonName = "Central Jail 1 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId = stateid,PhoneNumber="1234567890"  },
+                    new Prison {CityId = cityid,PrisonName = "Central Jail 2 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid ,PhoneNumber="1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Central Jail 3 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid ,PhoneNumber="1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Central Jail 4 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid , PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Central Jail 5 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Central Jail 6 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Central Jail 7 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Central Jail 8 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Central Jail 9 Tihar",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Central Jail 10 Rohini",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId = stateid  , PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Mandoli Jail 11",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid , PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Mandoli Jail 12",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid , PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Mandoli Jail 13",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid, StateId= stateid , PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Mandoli Jail 14",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Mandoli Jail 15",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"},
+                    new Prison {CityId = cityid, PrisonName = "Mandoli Jail 16",Address1 = "123 Main St",Address2 = "Block A",CountryId = countryid , StateId= stateid, PhoneNumber = "1234567890"}
+
+                };
+                dbContext.AddRange(prisons);
                 await dbContext.SaveChangesAsync();
             }
         }

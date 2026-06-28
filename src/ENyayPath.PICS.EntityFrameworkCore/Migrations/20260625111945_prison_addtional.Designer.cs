@@ -4,6 +4,7 @@ using ENyayPath.PICS.EntityFrameworkCore.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
 {
     [DbContext(typeof(PICSDbContext))]
-    partial class PICSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260625111945_prison_addtional")]
+    partial class prison_addtional
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -927,10 +930,6 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("SonDaughterOf")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PrisonerId");
@@ -953,9 +952,6 @@ namespace ENyayPath.PICS.EntityFrameworkCore.Migrations
 
                     b.Property<Guid>("DocumentId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("DocumentName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DocumentUploadLink")
                         .HasMaxLength(500)

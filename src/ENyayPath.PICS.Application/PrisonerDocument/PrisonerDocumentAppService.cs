@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using ENyayPath.PICS.Application.Prisoner;
 using ENyayPath.PICS.Application.PrisonerDocument.Dtos;
 using ENyayPath.PICS.Application.Services;

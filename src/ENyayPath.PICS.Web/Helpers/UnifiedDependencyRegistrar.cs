@@ -2,6 +2,7 @@
 using ENyayPath.PICS.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -116,7 +117,7 @@ namespace ENyayPath.PICS.Web.Helpers
                         mapped.Add(route);
 
                         var parameters = method.GetParameters();
-                        bool hasFormFile = parameters.Any(p => typeof(IFormFile).IsAssignableFrom(p.ParameterType));
+                        bool hasFormFile = parameters.Any(p => IsFormFileType(p.ParameterType));
                         bool useBody = !hasFormFile && parameters.Length == 1 && !IsSimple(parameters[0].ParameterType);
                         var verb = GetHttpVerb(method, useBody);
                         
@@ -273,7 +274,16 @@ namespace ENyayPath.PICS.Web.Helpers
                 for (int i = 0; i < parameters.Length; i++)
                 {
                     var p = parameters[i];
-                    if (typeof(IFormFile).IsAssignableFrom(p.ParameterType))
+                    if (IsFormFileType(p.ParameterType) && !typeof(IFormFile).IsAssignableFrom(p.ParameterType))
+                    {
+                        if (typeof(IFormFileCollection).IsAssignableFrom(p.ParameterType))
+                            args[i] = form.Files;
+                        else if (p.ParameterType.IsArray)
+                            args[i] = form.Files.ToArray();
+                        else
+                            args[i] = form.Files.ToList();
+                    }
+                    else if (typeof(IFormFile).IsAssignableFrom(p.ParameterType))
                     {
                         args[i] = form.Files.GetFile(p.Name) ?? form.Files.FirstOrDefault();
                     }
@@ -386,6 +396,15 @@ namespace ENyayPath.PICS.Web.Helpers
             if (services.Any(sd => sd.ServiceType == serviceType)) return;
             var descriptor = new ServiceDescriptor(serviceType, implType, lifetime);
             services.Add(descriptor);
+        }
+
+        private static bool IsFormFileType(Type t)
+        {
+            if (typeof(IFormFile).IsAssignableFrom(t)) return true;
+            if (typeof(IFormFileCollection).IsAssignableFrom(t)) return true;
+            if (t.IsArray && typeof(IFormFile).IsAssignableFrom(t.GetElementType())) return true;
+            if (t.IsGenericType && t.GetGenericArguments().Any(a => typeof(IFormFile).IsAssignableFrom(a))) return true;
+            return false;
         }
 
         private static bool IsSimple(Type t) => t.IsPrimitive || t == typeof(string) || t == typeof(decimal) || t == typeof(DateTime);

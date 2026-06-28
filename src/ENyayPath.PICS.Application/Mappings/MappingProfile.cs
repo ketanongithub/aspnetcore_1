@@ -24,6 +24,7 @@ using ENyayPath.PICS.Core.Settings;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ENyayPath.PICS.Application.Prison.Dto;
 
 namespace ENyayPath.PICS.Application.Mappings
 {
@@ -97,6 +98,9 @@ namespace ENyayPath.PICS.Application.Mappings
             CreateMap<Core.Eny.Prisoner.Wallet, WalletDto>()
                 .ForMember(dest => dest.WalletId, opt => opt.MapFrom(src => src.Id));
 
+            //Prison
+            CreateMap<Core.Eny.Prison.Prison, PrisonDto>()
+                .ForMember(dest => dest.PrisonId, opt => opt.MapFrom(src => src.Id));
             // PrisonerDocument mappings
             CreateMap<Core.Eny.Prisoner.PrisonerDocument, Application.PrisonerDocument.Dtos.PrisonerDocumentDto>()
                 .ForMember(dest => dest.PrisonerDocumentId, opt => opt.MapFrom(src => src.Id));
